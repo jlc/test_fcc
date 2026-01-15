@@ -1,0 +1,52 @@
+# FCCalendarFind in file L'App - DEV
+
+# /##
+# 
+#  performs Find Requests For the FCCalendar
+#   !!!!!!   DO NOT CHANGE THE NAME OF THIS SCRIPT    !!!!!!
+# 
+#  @param {object} json the payload coming from the widget
+#  @param {string} json.Data the data that got sent
+#  @param {string} json.Meta.Callback the callback function to call back to the widget
+#  @param {string} json.Meta.FetchId a string that uniquely identifies this specific call
+#  @param {object} json.Meta.Config the Config object passed into the widget on boot
+#  @param {object} json.Meta.AddonUUID the unique ID for this Addon Instance
+# 
+# #/
+Allow User Abort [ Off ]
+Set Error Capture [ On ]
+Perform Script [ Specified: From list ; “FCSetDefaultDayOfWeek” ; Parameter:    ]
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $data ; Value: JSONGetElement ( $json ; "Data" ) ]
+Set Variable [ $Callback ; Value: JSONGetElement ( $json ; "Meta.Callback" ) ]
+Set Variable [ $FetchID ; Value: JSONGetElement ( $json ; "Meta.FetchId" ) ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement ( $json ; "Meta.AddonUUID" ) ]
+Set Variable [ $Config ; Value: JSONGetElement ( $json ; "Meta.Config" ) ]
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+Set Variable [ $WidgetWebViewer ; Value: Get ( ScriptResult ) ]
+# 
+Set Variable [ $SearchField ; Value: JSONGetElement($Config; "EventFilterField.value") ]
+If [ not IsEmpty ( $SearchField ) ]
+	Set Variable [ $QueryField ; Value: JSONGetElement($Config; "EventFilterQueryField.value") ]
+	Set Variable [ $SearchFieldSplit ; Value: Substitute($SearchField; "::" ; "¶") ]
+	# 
+	Set Variable [ $SearchField ; Value: GetValue($SearchFieldSplit; 2) ]
+	Set Variable [ $QueryValue ; Value: GetField($QueryField) ]
+	Set Variable [ $data ; Value: JSONSetElement($data; "query[0]."  & $SearchField; $QueryValue; JSONString) ]
+End If
+# 
+# 
+If [ not IsEmpty ( $data ) ]
+	Execute FileMaker Data API [ Select ; Target: $result ; $data ]
+Else
+	Set Variable [ $result ; Value: JSONSetElement("";   ["messages[0].code"; -2 ; JSONNumber];   ["messages[0].message"; "invalid find" ; JSONString] ) ]
+End If
+Set Variable [ $code ; Value: JSONGetElement ( $result ; "messages[0].code" ) ]
+Set Variable [ $message ; Value: JSONGetElement ( $result ; "messages[0].message" ) ]
+# 
+# 
+If [ not IsEmpty ( $Callback ) ]
+	Perform JavaScript in Web Viewer [ Object Name: $WidgetWebViewer ; Function Name: $Callback ; Parameters: $result, $fetchId ]
+End If
+# 
+# 

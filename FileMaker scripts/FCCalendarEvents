@@ -1,0 +1,166 @@
+# FCCalendarEvents ORIGINAL in file L'App - DEV
+
+# 
+# /##
+# This Script Handles all of the events that the Calendar Widget Sends to FileMaker
+#     !!!!!!   DO NOT CHANGE THE NAME OF THIS SCRIPT    !!!!!!
+# 
+#  @param {object} json
+#  @param {object} json.Data the data sent to the script
+#  @param {object} json.Meta
+#  @param {string} json.Meta.AddonUUID
+#  @param {object} json.Meta.Config
+#  @param {string} json.Meta.EventType
+# 
+#  JLC: ALMOST ORIGINAL
+# 
+#  #/
+Allow User Abort [ Off ]
+#  show FileMaker Errors Here
+Set Error Capture [ Off ]
+# 
+# 
+Set Variable [ $json ; Value: Get(ScriptParameter) ]
+Set Variable [ $Data ; Value: JSONGetElement($JSON; "Data") ]
+Set Variable [ $meta ; Value: JSONGetElement($JSON; "Meta") ]
+Set Variable [ $eventType ; Value: JSONGetElement ($meta; "EventType") ]
+Set Variable [ $FetchId ; Value: JSONGetElement($meta; "FetchId") ]
+Set Variable [ $Config ; Value: JSONGetElement ($meta; "Config") ]
+Set Variable [ $Callback ; Value: JSONGetElement($meta; "Callback") ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($meta; "AddonUUID") ]
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+Set Variable [ $WidgetWebViewer ; Value: Get ( ScriptResult ) ]
+# 
+# 
+# 
+Set Variable [ $id ; Value: JSONGetElement ($data; "id") ]
+# 
+If [ $EventType = "EventClick" ]
+	# The Event was double clicked in the Calendar
+	# Open the event in a Card Window
+	# 
+	Set Variable [ $editable ; Value: True ]
+	# if you want events marked editable to not be clickable uncomment this next line
+	// Set Variable [ $editable ; Value: JSONGetElement($data; "editable") ]
+	# 
+	If [ not $editable ]
+		Show Custom Dialog [ "El evento no se puede editar" ; "Este evento se ha marcado como no editable en la base de datos" ]
+	Else
+		# 
+		Set Variable [ $eventDisplayLayout ; Value: JSONGetElement($data; "eventDisplayLayout") ]
+		Set Variable [ $idFieldName ; Value: JSONGetElement($data; "idFieldName") ]
+		# 
+		#  JLC - Modified dim parent window
+		New Window [ Style: Card ; Name: $AddonUUID ; Using layout: $eventDisplayLayout ]
+		# 
+		Enter Find Mode [ Pause: Off ]
+		Set Field By Name [ $idFieldName ; $id ]
+		Perform Find []
+		If [ Get(LastError) ]
+			Close Window [ Current Window ]
+		End If
+	End If
+	# 
+	# refresh the Addon
+	Perform Script [ Specified: From list ; “FCCalendar Refresh” ; Parameter: $AddonUUID ]
+	# 
+Else If [ $EventType = "ViewStateChanged" ]
+	# this runs when ever the calendar the dates it is viewing
+	# 
+	Set Variable [ $$Calendar.CurrentState ; Value: "" ]
+	Set Field [ FCCalendarAddon::CurrentState ; $data ]
+	Refresh Object [ Object Name: "CalendarTitle" ; Repetition: 1 ]
+	Refresh Object [ Object Name: "CalendarView" ; Repetition: 1 ]
+	# 
+	# 
+Else If [ $EventType = "EventDropped" ]
+	# this runs when the Event has been dragged to a new position in the calendar
+	# so we update the Event record to match it's new position
+	# 
+	Set Variable [ $idFieldName ; Value: JSONGetElement($data; "idFieldName") ]
+	Set Variable [ $startDateFieldName ; Value: JSONGetElement($data; "startDateFieldName") ]
+	Set Variable [ $startTimeFieldName ; Value: JSONGetElement($data; "startTimeFieldName") ]
+	Set Variable [ $endDateFieldName ; Value: JSONGetElement($data; "endDateFieldName") ]
+	Set Variable [ $endTimeFieldName ; Value: JSONGetElement($data; "endTimeFieldName") ]
+	# 
+	Set Variable [ $newStartDate ; Value: JSONGetElement($data; "newStartDate") ]
+	Set Variable [ $newStartTime ; Value: JSONGetElement($data; "newStartTime") ]
+	Set Variable [ $newEndDate ; Value: JSONGetElement($data; "newEndDate") ]
+	Set Variable [ $newEndTime ; Value: JSONGetElement($data; "newEndTime") ]
+	# 
+	Set Variable [ $eventDisplayLayout ; Value: JSONGetElement($data; "eventDisplayLayout") ]
+	#  JLC - Modified dim parent window
+	New Window [ Style: Card ; Name: $eventDisplayLayout ; Using layout: $eventDisplayLayout ]
+	If [ Get(SystemPlatform) = 4 // required for WebDirect ]
+		Pause/Resume Script [ Duration (seconds): ",01" ]
+	End If
+	# 
+	Enter Find Mode [ Pause: Off ]
+	Set Field By Name [ $idFieldName ; $id ]
+	Perform Find []
+	If [ Get(LastError) ]
+		Close Window [ Current Window ]
+	Else
+		# this will open the record
+		Set Field By Name [ $startDateFieldName ; $newStartDate ]
+		If [ Get(LastError) ]
+			# if the record can't we just close the window and skip the rest
+			Close Window [ Current Window ]
+		Else
+			Set Field By Name [ $startTimeFieldName ; $newStartTime ]
+			Set Field By Name [ $endDateFieldName ; $newEndDate ]
+			Set Field By Name [ $endTimeFieldName ; $newEndTime ]
+			Close Window [ Current Window ]
+		End If
+	End If
+	# 
+	# refresh the Addon
+	Perform Script [ Specified: From list ; “FCCalendar Refresh” ; Parameter: $AddonUUID ]
+	# 
+	# 
+Else If [ $EventType = "EventResized" ]
+	# 
+	Set Variable [ $idFieldName ; Value: JSONGetElement($data; "idFieldName") ]
+	Set Variable [ $endDateFieldName ; Value: JSONGetElement($data; "endDateFieldName") ]
+	Set Variable [ $endTimeFieldName ; Value: JSONGetElement($data; "endTimeFieldName") ]
+	Set Variable [ $newEndTime ; Value: JSONGetElement($data; "newEndTime") ]
+	Set Variable [ $newEndDate ; Value: JSONGetElement($data; "newEndDate") ]
+	# 
+	Set Variable [ $eventDisplayLayout ; Value: JSONGetElement($data; "eventDisplayLayout") ]
+	#  JLC - Modified dim parent window
+	New Window [ Style: Card ; Name: $eventDisplayLayout ; Using layout: $eventDisplayLayout ]
+	If [ Get(SystemPlatform) = 4 // required for WebDirect ]
+		Pause/Resume Script [ Duration (seconds): ",01" ]
+	End If
+	# 
+	Enter Find Mode [ Pause: Off ]
+	Set Field By Name [ $idFieldName ; $id ]
+	Perform Find []
+	If [ Get(LastError) ]
+		Close Window [ Current Window ]
+	Else
+		Set Field By Name [ $endDateFieldName ; $newEndDate ]
+		If [ Get(LastError) ]
+			Close Window [ Current Window ]
+		Else
+			Set Field By Name [ $endTimeFieldName ; $newEndTime ]
+			Close Window [ Current Window ]
+		End If
+	End If
+	# 
+	# refresh the Addon
+	Perform Script [ Specified: From list ; “FCCalendar Refresh” ; Parameter: $AddonUUID ]
+	# 
+Else If [ $EventType="NewEventFromSelected" ]
+	# 
+	# 
+	Set Variable [ $params ; Value: JSONSetElement ("";   ["Data"; $Data; JSONObject];   ["AddonUUID"; $AddonUUID ; JSONString] ) ]
+	Perform Script [ Specified: From list ; “FCCalendar Add Event - With Payment (JLC)” ; Parameter: $params ]
+	# 
+	# 
+End If
+# 
+# 
+# 
+# 
+# 

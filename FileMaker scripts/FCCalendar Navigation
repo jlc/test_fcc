@@ -1,0 +1,39 @@
+# FCCalendar Navigation in file L'App - DEV
+
+# 
+# /##
+# 
+#  uses Perform JavaScript On WebViewer to Advance the Calendar Date
+# 
+#  @param {object} json
+#  @param {string} json.direction the direction to navigate. one of "prev", "next", "today"
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+# 
+#  #/
+Allow User Abort [ Off ]
+Set Error Capture [ On ]
+# 
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $nav ; Value: JSONGetElement($json; "direction") ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($json; "AddonUUID") ]
+# 
+# 
+# the name of the web viewer widget
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+Set Variable [ $WebViewerName ; Value: Get ( ScriptResult ) ]
+# 
+# 
+# 
+If [ $nav = "next" ]
+	Set Variable [ $functionName ; Value: "Calendar_Next" ]
+Else If [ $nav = "prev" ]
+	Set Variable [ $functionName ; Value: "Calendar_Prev" ]
+Else If [ $nav = "today" ]
+	Set Variable [ $functionName ; Value: "Calendar_Today" ]
+End If
+Perform JavaScript in Web Viewer [ Object Name: $WebViewerName ; Function Name: $functionName ]
+# 
+#  resets the button bar state
+Refresh Object [ Object Name: "FCCalendarToday" ; Repetition: 1 ]
+Refresh Object [ Object Name: "FCalendarAddEvent" ; Repetition: 1 ]
+Refresh Object [ Object Name: "FCCalendarNav" ; Repetition: 1 ]

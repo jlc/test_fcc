@@ -1,0 +1,13 @@
+# FCCalendar Navigation Button in file L'App - DEV
+
+# /##
+#  handle the Button Click for the nav bar
+# 
+#  @param {object} json
+#  @param {string} json.direction the direction to navigate. one of "prev", "next", "today"
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+# 
+#  #/
+# 
+Perform Script [ Specified: From list ; “FCCalendar Navigation” ; Parameter: Get ( ScriptParameter ) ]
+# 

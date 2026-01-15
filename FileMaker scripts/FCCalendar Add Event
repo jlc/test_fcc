@@ -1,0 +1,68 @@
+# FCCalendar Add Event - With Payment (JLC) in file L'App - DEV
+
+# 
+# 
+# /##
+#  Open a Card window on the Event Display Layout and create new record
+#  @param {object} json
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+#  @param {object} json.Data the object that contains the data to make the new event
+#  
+# Modified by JLC:
+#  - Store related tables ids: Consultant, VisitDetail
+#  
+#  #/
+Allow User Abort [ Off ]
+Set Error Capture [ On ]
+# 
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($json; "AddonUUID") ]
+Set Variable [ $Data ; Value: JSONGetElement($json; "Data") ]
+# 
+Set Variable [ $Config ; Value: FCCalendarConfig ( $AddonUUID ) ]
+Set Variable [ $StartDateField ; Value: JSONGetElement ( $Config; "EventStartDateField.value" ) ]
+Set Variable [ $EndDateField ; Value: JSONGetElement ( $Config; "EventEndDateField.value" ) ]
+Set Variable [ $StartTimeField ; Value: JSONGetElement ( $Config; "EventStartTimeField.value" ) ]
+Set Variable [ $EndTimeField ; Value: JSONGetElement ( $Config; "EventEndTimeField.value" ) ]
+Set Variable [ $AllDayField ; Value: JSONGetElement ( $Config; "EventAllDayField.value" ) ]
+Set Variable [ $eventDisplayLayout ; Value: JSONGetElement ( $Config; "EventDetailLayout.value" ) ]
+# 
+# 
+Set Variable [ $StartDateStr ; Value: JSONGetElement($Data; "StartDateStr") ]
+Set Variable [ $StartTimeStr ; Value: JSONGetElement($Data; "StartTimeStr") ]
+Set Variable [ $EndDateStr ; Value: JSONGetElement($Data; "EndDateStr") ]
+Set Variable [ $EndTimeStr ; Value: JSONGetElement($Data; "EndTimeStr") ]
+Set Variable [ $AllDay ; Value: JSONGetElement($Data; "AllDay") ]
+# 
+# 
+Refresh Object [ Object Name: "FCalendarAddEvent" ; Repetition: 1 ]
+# 
+# NOTE - we store the AddonUUID in the WindowName so the window can pick it up when it closes
+#  JLC - Modified: dim parent windows + remove the close button
+New Window [ Style: Card ; Name: $AddonUUID ; Using layout: $eventDisplayLayout ]
+# 
+New Record/Request
+Set Field By Name [ $StartDateField ; $StartDateStr ]
+Set Field By Name [ $EndDateField ; $EndDateStr ]
+Set Field By Name [ $StartTimeField ; $StartTimeStr ]
+Set Field By Name [ $EndTimeField ; $EndTimeStr ]
+Set Field By Name [ $EndTimeField ; $EndTimeStr ]
+Set Field By Name [ $AllDay ; $AllDay ]
+# 
+# 
+# the user can now fill out the rest.
+# 
+#  -- BEGIN -- JLC
+# 
+# retrieve consultant from param
+Set Variable [ $consultantId ; Value: JSONGetElement ( $Data ; "ConsultantId" ) ]
+# 
+Perform Script [ Specified: From list ; “Visit Common - Finish Create Visit” ; Parameter: $consultantId ]
+# 
+#  We are in Visit Event Display, select the open tab.
+Go to Object [ Object Name: "Tab Clinic Status - Open" ]
+# 
+#  -- END -- JLC
+# 
+# 
+# 

@@ -1,0 +1,37 @@
+# FCCalendar Add Event Button - ORIGINAL in file L'App - DEV
+
+# /##
+#  handle the Button Click for the add event
+# 
+#  @param {object} json
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+# 
+#  #/
+# 
+# use the AddonUUID to get the fields we need
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($json; "AddonUUID") ]
+Set Variable [ $Config ; Value: FCCalendarConfig ( $AddonUUID ) ]
+Set Variable [ $StartDateField ; Value: JSONGetElement ( $Config; "EventStartDateField.value" ) ]
+Set Variable [ $EndDateField ; Value: JSONGetElement ( $Config; "EventEndDateField.value" ) ]
+Set Variable [ $StartTimeField ; Value: JSONGetElement ( $Config; "EventStartTimeField.value" ) ]
+Set Variable [ $EndTimeField ; Value: JSONGetElement ( $Config; "EventEndTimeField.value" ) ]
+# 
+# add the name of the layout to use.
+Set Variable [ $eventDisplayLayout ; Value: JSONGetElement ( $Config; "EventDetailLayout.value" ) ]
+# 
+# parse the First Date of the current CalendarView
+// Set Variable [ $beginDateOfCalendar ; Value: Let( [ dateStr = JSONGetElement ( FCCalendarAddon::CurrentState ; "activeStart" ); split = Substitute ( dateStr; ["-"; "¶"];["T"; "¶"] ); dd = GetValue ( split;3) ; mm = GetValue ( split;2) ; yyyy = GetValue ( split;1) ]; Date ( mm ; dd ; yyyy ) ) ]
+# 
+# start time set to the next 15 minute mark
+Set Variable [ $startTime ; Value: Let( [   QuarterHrs = GetAsNumber(Get(CurrentTime) )/60/15;   roundUp = Ceiling ( QuarterHrs );   seconds =  roundUp * 15 * 60 ];   GetAsTime( seconds) ) ]
+# 
+Refresh Object [ Object Name: "FCalendarAddEvent" ; Repetition: 1 ]
+# 
+# NOTE - we store the AddonUUID in the WindowName so the window can pick it up when it closes
+Set Variable [ $Data ; Value: JSONSetElement ("";   ["StartDateStr"; $beginDateOfCalendar; JSONString];   ["StartTimeStr"; $StartTime ; JSONString];   ["EndDateStr"; $beginDateOfCalendar; JSONString];   ["EndTimeStr"; GetAsTime($startTime + 30 * 60) ; JSONString];   ["AllDay"; $AllD… ]
+Set Variable [ $params ; Value: JSONSetElement ("";   ["Data"; $Data; JSONObject];   ["AddonUUID"; $AddonUUID ; JSONString] ) ]
+Perform Script [ Specified: From list ; “FCCalendar Add Event - With Payment (JLC)” ; Parameter: $params ]
+# 
+# 
+# 

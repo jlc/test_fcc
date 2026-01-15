@@ -1,0 +1,13 @@
+# FCCalendar Set View Button in file L'App - DEV
+
+# /##
+#  handle the Button Click for the Set View Bar
+# 
+#  @param {object} json
+#  @param {string} json.view the calendar view to display. one of "dayGridView", "timeGridWeek", "timeGridMonth"
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+# 
+#  #/
+# 
+Perform Script [ Specified: From list ; “FCCalendar View Change ” ; Parameter: Get ( ScriptParameter ) ]
+# 

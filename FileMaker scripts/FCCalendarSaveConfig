@@ -1,0 +1,67 @@
+# FCCalendarSaveConfig - ORIGINAL in file L'App - DEV
+
+# /##
+# 
+#  Stores the configuration
+#   !!!!!!   DO NOT CHANGE THE NAME OF THIS SCRIPT    !!!!!!
+# 
+#  @param {object} json the payload coming from the widget
+#  @param {string} json.data the data that got sent
+#  @param {string} json.meta.Callback the callback function to call back to the widget
+#  @param {string} json.meta.FetchId a string that uniquely identifies this specific call
+# 
+# #/
+Allow User Abort [ Off ]
+Set Error Capture [ On ]
+# 
+# change to match the path of your selected layout
+Set Variable [ $SelectedLayoutPath ; Value: "EventDetailLayout.value" ]
+# 
+# 
+# 
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $NewConfig ; Value: JSONGetElement ( $json ; "Data" ) ]
+Set Variable [ $meta ; Value: JSONGetElement ( $json ; "Meta" ) ]
+Set Variable [ $FetchID ; Value: JSONGetElement ( $meta ; "FetchId" ) ]
+Set Variable [ $Callback ; Value: JSONGetElement ( $meta ; "Callback" ) ]
+# 
+Set Variable [ $AddonUUID ; Value: JSONGetElement ( $Meta ; "AddonUUID" ) ]
+Set Variable [ $OldConfig ; Value: JSONGetElement ( $meta ; "Config" ) ]
+# 
+# 
+# passing empty "", gives us the name of the Configurator webviewer
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: "" ]
+Set Variable [ $WidgetWebViewer ; Value: Get ( ScriptResult ) ]
+# 
+# 
+Set Variable [ $EventType ; Value: JSONGetElement($Meta;"EventType") ]
+If [ $EventType <> "cancel" ]
+	Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+	Set Variable [ $WidgetWebViewer ; Value: Get ( ScriptResult ) ]
+	If [ $AddonUUID="[<^FMXML_AddonInstanceUUID>]" ]
+		Set Variable [ $AddonUUID ; Value: "DEV_UUID" ]
+	End If
+	# 
+	# 
+	Set Variable [ $ConfigStore ; Value: FCCalendarAddon::ConfigStore ]
+	# 
+	Set Variable [ $ConfigStore ; Value: JSONSetElement ( $ConfigStore; $AddonUUID ; $newConfig; JSONObject ) ]
+	# 
+	# if there is a problem do not destroy other configs
+	If [ Left($ConfigStore ;3 ) <> "? *" ]
+		Set Field [ FCCalendarAddon::ConfigStore ; $ConfigStore ]
+	End If
+	# 
+	# 
+	# 
+	If [ not IsEmpty ( $Callback ) ]
+		Perform JavaScript in Web Viewer [ Object Name: $WidgetWebViewer ; Function Name: $Callback ; Parameters: $result, $fetchId ]
+	End If
+	# 
+End If
+# 
+# We navigate to an emmpty web page here to clear the WebViewer cache, then we pause, then we close the window.
+Set Web Viewer [ Object Name: $WidgetWebViewer ; URL: "data:text/html, <html></html>" ]
+Pause/Resume Script [ Duration (seconds): ",1" ]
+Close Window [ Current Window ]
+# 

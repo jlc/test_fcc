@@ -1,0 +1,114 @@
+{
+  "DEV_UUID": {
+    "DefaultEventStyle": { "type": "select", "value": "" },
+    "EventAllDayField": {
+      "type": "select",
+      "value": "FCCalendarSampleEvents::AllDay"
+    },
+    "EventDescriptionField": { "type": "select", "value": "" },
+    "EventDetailLayout": {
+      "reScanOnChange": true,
+      "required": true,
+      "type": "select",
+      "value": "Event Display"
+    },
+    "EventEditableField": {
+      "type": "select",
+      "value": "FCCalendarSampleEvents::Editable"
+    },
+    "EventEndDateField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::EndDate"
+    },
+    "EventEndTimeField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::EndTime"
+    },
+    "EventFilterField": { "type": "select", "value": "" },
+    "EventFilterQueryField": { "type": "select", "value": "" },
+    "EventPrimaryKeyField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::Id"
+    },
+    "EventStartDateField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::StartDate"
+    },
+    "EventStartTimeField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::StartTime"
+    },
+    "EventStyleField": {
+      "type": "select",
+      "value": "FCCalendarSampleEvents::Style"
+    },
+    "EventTitleField": {
+      "required": true,
+      "type": "select",
+      "value": "FCCalendarSampleEvents::Title"
+    },
+    "StartOnDay": { "type": "select", "value": "Sunday" },
+    "StartingView": { "type": "select", "value": "Month" }
+  },
+  "F84BA49F-913B-4818-9C3D-5CDAEC10CA6D": {
+    "DefaultEventStyle": { "type": "select", "value": "" },
+    "EventAllDayField": { "type": "select", "value": "VisitEvents::AllDay" },
+    "EventDescriptionField": { "type": "select", "value": "" },
+    "EventDetailLayout": {
+      "reScanOnChange": true,
+      "required": true,
+      "type": "select",
+      "value": "Visit Event Display"
+    },
+    "EventEditableField": {
+      "type": "select",
+      "value": "VisitEvents::Editable"
+    },
+    "EventEndDateField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::EndDate"
+    },
+    "EventEndTimeField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::EndTime"
+    },
+    "EventFilterField": {
+      "type": "select",
+      "value": "VisitEvents::DoctorAccountName"
+    },
+    "EventFilterQueryField": {
+      "type": "select",
+      "value": "VisitEvents::g_CalendarAccountNameQuery"
+    },
+    "EventPrimaryKeyField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::Id"
+    },
+    "EventStartDateField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::StartDate"
+    },
+    "EventStartTimeField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::StartTime"
+    },
+    "EventStyleField": { "type": "select", "value": "VisitEvents::Style" },
+    "EventTitleField": {
+      "required": true,
+      "type": "select",
+      "value": "VisitEvents::Title"
+    },
+    "StartOnDay": { "type": "select", "value": "Monday" },
+    "StartingView": { "type": "select", "value": "Week" }
+  }
+}

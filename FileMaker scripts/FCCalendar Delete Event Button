@@ -1,0 +1,19 @@
+# FCCalendar Delete Event Button - ORIGINAL in file L'App - DEV
+
+# 
+# /##
+# 
+#  @param n/a
+# 
+#  #/
+# 
+# 
+Set Variable [ $AddonUUID ; Value: Get(WindowName) ]
+Delete Record/Request [ With dialog: Off ]
+Commit Records/Requests [ With dialog: Off ]
+Close Window [ Current Window ]
+# 
+# 
+Perform Script [ Specified: From list ; “FCCalendar Refresh” ; Parameter: $AddonUUID ]
+# 
+# 

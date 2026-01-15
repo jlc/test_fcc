@@ -1,0 +1,94 @@
+# FCCalendarSchema in file L'App - DEV
+
+# /##
+# 
+#  Scans the database for useful meta data for configuration
+#   !!!!!!   DO NOT CHANGE THE NAME OF THIS SCRIPT    !!!!!!
+# 
+#  @param {object} json
+#  @param {object} json.Data the data sent to the script
+#  @param {object} json.Meta
+#  @param {string} json.Meta.AddonUUID
+#  @param {object} json.Meta.Config
+#  @param {string} json.Meta.EventType
+# 
+# 
+#  #/
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+# 
+Set Variable [ $SelectedLayoutPath ; Value: "EventDetailLayout.value" ]
+# 
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $Callback ; Value: JSONGetElement ( $json ; "Meta.Callback" ) ]
+Set Variable [ $data ; Value: JSONGetElement ( $json ; "Data" ) ]
+Set Variable [ $meta ; Value: JSONGetElement ( $json ; "Meta" ) ]
+Set Variable [ $FetchID ; Value: JSONGetElement ( $meta ; "FetchId" ) ]
+# 
+Set Variable [ $AddonUUID ; Value: JSONGetElement ( $meta ; "AddonUUID" ) ]
+Set Variable [ $OldConfig ; Value: JSONGetElement ( $meta ; "Config" ) ]
+# This is because the DATA represents the Latest config
+Set Variable [ $Config ; Value: $Data ]
+# 
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: "Configurator" ]
+Set Variable [ $WidgetWebViewer ; Value: Get ( ScriptResult ) ]
+# 
+# 
+Set Variable [ $LayoutsArray ; Value: Let( [ Layouts =  LayoutNames ( Get(FileName ) ); Layouts = "[\"" & Substitute ( Layouts ; "¶" ; "\",\"" ) & "\"]" ]; Layouts ) ]
+Set Variable [ $ScriptsArray ; Value: Let( [ Scripts =  ScriptNames ( Get(FileName ) ); Scripts = "[\"" & Substitute ( Scripts ; "¶" ; "\",\"" ) & "\"]" ]; Scripts ) ]
+Set Variable [ $ValueListsArrays ; Value: Let( [ ValueLists =  ValueListNames ( Get(FileName ) ); ValueLists = "[\"" & Substitute ( ValueLists ; "¶" ; "\",\"" ) & "\"]" ]; ValueLists ) ]
+# 
+# 
+# First we just update the layout selectors
+Set Variable [ $Config ; Value: JSONSetElement ( $Config ; "EventDetailLayout.options"; $LayoutsArray ; JSONArray ) ]
+Set Variable [ $SelectedLayoutName ; Value: JSONGetElement($Config ;   $SelectedLayoutPath ) ]
+# 
+# 
+# ## LAYOUT FIELD SCAN. ======== not going to change. same for all widgets
+Set Variable [ $request ; Value: JSONSetElement ("";   ["action"; "metaData"; JSONString];   ["layouts"; $SelectedLayoutName; JSONString] ) ]
+Execute FileMaker Data API [ Select ; Target: $result ; $request ]
+# 
+Set Variable [ $tableName ; Value: JSONGetElement ( $result ; "response.table" ) ]
+Set Variable [ $fieldScanResult ; Value: While ( [ lName =  $SelectedLayoutName ; tableName = $tableName ; //Setup intial values fields = FieldNames ( Get(FileName) ; lName ); n=0; thisField = ""; fullName = ""; allFields = ""; c = ValueCount ( fields ); type =""; dataType =""; textFields =… ]
+# ## LAYOUT FIELD SCAN. ========
+# 
+# 
+# 
+# Custom Options for this widget
+Set Variable [ $FieldsOnThisLayoutList ; Value: While ( [ fNames = FieldNames ( Get(FileName) ; FCCalendarAddon::OriginalLayout); n=1; thisField = GetValue ( fNames;n ); result=""  ] ; not IsEmpty ( thisField ) ; [ thisLine =    If(      PatternCount(thisField ;"::")>0 ; thisField;      FCCalen… ]
+Set Variable [ $FieldsOnThisLayoutArray ; Value: "[\"" & Substitute ( $FieldsOnThisLayoutList ; "¶"; "\",\"" ) & "\"]" ]
+# 
+# 
+Set Variable [ $IDOptions ; Value: JSONGetElement( $fieldScanResult ; "id") ]
+Set Variable [ $DateFieldsArray ; Value: JSONGetElement($fieldScanResult ; "date") ]
+Set Variable [ $TimeFieldsArray ; Value: JSONGetElement($fieldScanResult ; "time") ]
+Set Variable [ $TextFieldsArray ; Value: JSONGetElement($fieldScanResult ; "text") ]
+Set Variable [ $NumberFieldsArray ; Value: JSONGetElement($fieldScanResult ; "number") ]
+Set Variable [ $AllFieldsOnSelectedLayoutArray ; Value: JSONGetElement($fieldScanResult ; "all") ]
+# 
+# 
+Set Variable [ $EventStyleOptions ; Value: "[\"" & Substitute (      ValueListItems ( Get(FileName) ; "FCCalendar Styles" )          ; "¶"; "\",\"" ) & "\"]" ]
+Insert Text [ Select ; Target: $dayArray ; “["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]” ]
+# 
+# #add options to Config
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventStartDateField.options" ; $DateFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventStartTimeField.options" ; $TimeFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventPrimaryKeyField.options" ; $IdOptions ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventEndDateField.options" ; $DateFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventEndTimeField.options" ; $TimeFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventTitleField.options" ; $TextFieldsArray;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventDescriptionField.options" ; $TextFieldsArray;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventAllDayField.options" ; $NumberFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventEditableField.options" ; $NumberFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "DefaultEventStyle.options" ; $EventStyleOptions;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventStyleField.options" ; $TextFieldsArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "StartOnDay.options" ; $dayArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventFilterField.options" ;  $AllFieldsOnSelectedLayoutArray ;JSONArray ) ]
+Set Variable [ $config ; Value: JSONSetElement ( $Config ; "EventFilterQueryField.options" ;  $FieldsOnThisLayoutArray ;JSONArray ) ]
+# 
+If [ not IsEmpty ( $Callback ) ]
+	Set Variable [ $result ; Value: $config ]
+	Perform JavaScript in Web Viewer [ Object Name: $WidgetWebViewer ; Function Name: $Callback ; Parameters: $result, $fetchId ]
+End If
+# 
+Exit Script [ Text Result: $Config ]

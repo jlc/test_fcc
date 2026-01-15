@@ -1,0 +1,47 @@
+# FCCalendar Button Show Config - ORIGINAL in file L'App - DEV
+
+# 
+# /##
+# 
+#  Shows the Configurator for the widget
+# 
+#  @param {object} json the data coming from the script parameter
+#  @param {string} json.AddonUUID - the unique ID of this instance of the Addon.
+# 
+# #/
+Set Error Capture [ On ]
+Allow User Abort [ Off ]
+Commit Records/Requests [ With dialog: On ]
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($json ; "AddonUUID" ) ]
+# 
+# 
+#  We'll need this data for scanning fields
+Set Field [ FCCalendarAddon::OriginalTable ; Get(LayoutTableName) ]
+Set Field [ FCCalendarAddon::OriginalLayout ; Get(LayoutName) ]
+Set Field [ FCCalendarAddon::CurrentAddonUUID ; $AddonUUID ]
+# 
+# 
+# 
+# Opening the Card Window.  You will need a pause of .1 second after this step
+New Window [ Style: Card ; Name: $AddonUUID ; Using layout: “FCCalendar Config” (FCCalendarAddon) ]
+Pause/Resume Script [ Duration (seconds): ".5" ]
+# 
+# Passing "" here will give me the configurator's web viewer name
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: "" ]
+Set Variable [ $WebViewerName ; Value: Get ( ScriptResult ) ]
+# 
+# 
+# 
+# Now we build up the URL, and pass it to the web viewer
+Set Variable [ $initialProps ; Value: Let( [ AddonUUID = FCCalendarAddon::CurrentAddonUUID; Config = FCCalendarConfig ( AddonUUID ); initialProps = JSONSetElement ("";       ["Config"; Config; JSONObject];       ["AddonUUID"; AddonUUID; JSONString];       ["ShowConfig"; True; JSONBoolean]; … ]
+Set Variable [ $url ; Value: FCCalendarDataURL ( $initialProps ) ]
+Set Web Viewer [ Object Name: $WebViewerName ; URL: $url ]
+# 
+# 
+# 
+# This part is only ever run by the developer of the Addon. You can safely ignore it.
+If [ $$FCCalendar_DEV_URL ]
+	Perform JavaScript in Web Viewer [ Object Name: $webViewerName ; Function Name: "loadInitialProps" ; Parameters: $initialProps ]
+End If
+# 

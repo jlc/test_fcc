@@ -1,0 +1,26 @@
+# FCCalendar Get WebViewer Object Name in file L'App - DEV
+
+# 
+# 
+# 
+# 
+# 
+# 
+# /##
+# 
+#  This script's job is to calculate the WebViewer Name that is used to target the JavaScript calls
+#  @param {text} AddonUUID the unqiue Id of the webviewer to target
+# 
+# #/
+# 
+Set Variable [ $AddonUUID ; Value: Get ( ScriptParameter ) ]
+# 
+Set Variable [ $Prefix ; Value: "FCCalendarWV_" ]
+If [ IsEmpty ( $AddonUUID ) ]
+	# if no AddonUUID is passed in, this will find all the Calendar WebViewers on the layout
+	Set Variable [ $CalendarWebViewers ; Value: While ( [ prefix = $Prefx; l = Length(prefix); objects = LayoutObjectNames ( Get(FileName) ; Get(LayoutName) ); n = 1; thisObject = GetValue(objects;1); result = "" ]; not IsEmpty ( thisObject ); [ thisObjectsType = GetLayoutObjectAttribute ( thisObjec… ]
+	Set Variable [ $FirstWebViewer ; Value: GetValue($CalendarWebViewers; 1) ]
+	Exit Script [ Text Result: $FirstWebViewer ]
+End If
+# 
+Exit Script [ Text Result: $Prefix&  Get ( ScriptParameter ) ]

@@ -1,0 +1,23 @@
+Let(
+[
+AddonUUID = "F84BA49F-913B-4818-9C3D-5CDAEC10CA6D";
+Config = FCCalendarConfig ( AddonUUID );
+
+initialProps = JSONSetElement ("";
+      ["Config"; Config; JSONObject];
+      ["AddonUUID"; AddonUUID; JSONString];
+
+         // ---Optional—-
+      ["Meta.System.Appearance" ; Get(SystemAppearance) ; JSONString];
+      ["Meta.System.Platform" ; Get(SystemPlatform) ; JSONString];
+      ["Meta.Application.Version" ; Get(ApplicationVersion) ; JSONString];
+      ["Meta.Application.Language" ; Get(ApplicationLanguage) ; JSONString]
+
+    )
+
+
+];
+
+FCCalendarDataURL ( initialProps )
+
+)

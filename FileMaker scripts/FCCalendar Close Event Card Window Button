@@ -1,0 +1,12 @@
+# FCCalendar Close Event Card Window Button - ORIGINAL in file L'App - DEV
+
+# 
+# /##
+#  Close the Event Display Card Window
+#  #/
+# 
+# 
+Set Variable [ $AddonUUID ; Value: Get(WindowName) ]
+Close Window [ Current Window ]
+# 
+Perform Script [ Specified: From list ; “FCCalendar Refresh” ; Parameter: $AddonUUID ]

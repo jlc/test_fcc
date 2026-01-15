@@ -1,0 +1,18 @@
+# FCCalendar Refresh in file L'App - DEV
+
+# /##
+#  tell the calendar to refresh its data
+#  #/
+# 
+# 
+Set Variable [ $AddonUUID ; Value: Get ( ScriptParameter ) ]
+# 
+# 
+# the name of the web viewer widget
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+Set Variable [ $WebViewerName ; Value: Get ( ScriptResult ) ]
+# 
+# 
+# 
+Set Variable [ $function ; Value: "Calendar_Refresh" ]
+Perform JavaScript in Web Viewer [ Object Name: $webViewerName ; Function Name: $function ]

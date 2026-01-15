@@ -1,0 +1,30 @@
+Let(
+[
+AddonUUID = If (   AddonUUID="[<^FMXML_AddonInstanceUUID>]"  ; "DEV_UUID"; AddonUUID);
+FieldRef = FCCalendarAddon::ConfigStore;
+
+FullFieldName = GetFieldName(FieldRef);
+Split = Substitute ( FullFieldName; "::" ; "¶" );
+FieldName = GetValue(Split;2);
+TableName = GetValue ( Split;1 );
+SQLFieldName = Quote(TableName) & "." & Quote(FieldName);
+SQL = 
+  List(
+    "SELECT " & SQLFieldName ;
+    "FROM " & TableName;
+    "FETCH FIRST 1 ROWS ONLY"
+);
+
+ConfigStore = ExecuteSQL ( sql; "";"" ) ;
+AddonConfig = JSONGetElement ( ConfigStore; AddonUUID );
+// if there isn't one use the default
+AddonConfig = If(IsEmpty(AddonConfig) ;    JSONGetElement ( ConfigStore; "DEV_UUID" )  ;  AddonConfig  )
+
+];
+
+  Case(
+    Left(AddonConfig; 3) = "? *" ; "";
+    AddonConfig
+  )
+
+)

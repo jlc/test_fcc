@@ -1,0 +1,26 @@
+# FCCalendar View Change  in file L'App - DEV
+
+# /##
+# 
+#  uses Perform JavaScript On WebViewer to change the Calendar View
+# 
+#  @param {object} json
+#  @param {string} json.view the calendar view to display. one of "dayGridView", "timeGridWeek", "timeGridMonth"
+#  @param {string} json.AddonUUID the unique id of this instance of the addon
+# 
+#  #/
+# 
+Allow User Abort [ Off ]
+Set Error Capture [ On ]
+# 
+Set Variable [ $json ; Value: Get ( ScriptParameter ) ]
+Set Variable [ $view ; Value: JSONGetElement($json; "view") ]
+Set Variable [ $AddonUUID ; Value: JSONGetElement($json; "AddonUUID") ]
+# 
+# 
+# the name of the web viewer widget
+Perform Script [ Specified: From list ; “FCCalendar Get WebViewer Object Name” ; Parameter: $AddonUUID ]
+Set Variable [ $WebViewerName ; Value: Get ( ScriptResult ) ]
+# 
+# Call the JavaScript Function in the Calendar
+Perform JavaScript in Web Viewer [ Object Name: $WebViewerName ; Function Name: "Calendar_SetView" ; Parameters: $view ]

@@ -1,0 +1,48 @@
+/**
+*
+* This function is responsible for building the Addon's Data URL
+* and merging with the initialProps.
+*
+* @param {object} initialProps = this is the object thaat will get merged into the HTML
+*
+* @returns {string} the data url
+*
+*/
+
+Let(
+[
+
+// this is the field that holds the Addon HTML
+
+fName = GetFieldName ( FCCalendarAddon::HTML );
+
+url = If(
+
+    // if  we are in DEV MODE just return the Dev URL
+     not IsEmpty($$FCCalendar_DEV_URL) ; $$FCCalendar_DEV_URL ; 
+
+
+    // fetch the HTML and merge it
+     Let(
+      [
+       
+       //this forms the SQL statement protecting against name changes
+       split = Substitute ( fName; "::" ; "¶" );
+       t = Quote(GetValue ( split;1 ));
+       f = Quote(GetValue(split;2));
+
+       sql = "SELECT " & t & "." & f & " FROM " & t & " FETCH FIRST 1 ROWS ONLY";
+       html = "data:text/html," & ExecuteSQL ( sql ; ""; "" );
+       html = Substitute (html ; ["\"__PROPS__\""; InitialProps] )
+    
+     ];
+     html
+   )
+
+)
+
+];
+
+url
+
+)
